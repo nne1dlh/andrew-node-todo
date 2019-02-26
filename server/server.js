@@ -10,13 +10,23 @@ var app = xpress();
 app.use(bp.json());
 
 app.post('/todos', (req,res) => {
-    console.log("piss pump",req.body);
+    console.log("from server.js",req.body);
     var task = new Todo({
         task: req.body.text
     });
     task.save().then((resx) => {
         console.log("send resx: ", resx);
         res.send(resx);
+    }, (err) => {
+        res.status(400).send(err);
+    });
+});
+
+app.get('/todos', (req,res) => {
+    Todo.find().then((x) => {
+        res.send({
+            todos: x
+        })
     }, (err) => {
         res.status(400).send(err);
     });
