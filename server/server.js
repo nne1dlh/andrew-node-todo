@@ -4,6 +4,7 @@ var bp = require('body-parser');
 var {mongoose} = require('./db/mongooz');
 var {Todo} = require('./models/todo');
 var User = require('./models/user').User;
+const {ObjectID} = require('mongodb');
 
 var app = xpress();
 
@@ -28,6 +29,24 @@ app.get('/todos', (req,res) => {
     }, (err) => {
         res.status(400).send(err);
     });
+});
+
+app.get('/todos/:idx', (req,res) =>{
+    var id = req.params.idx;
+    //vlidate ID using isValid
+    if (!ObjectID.isValid(id)){
+        res.status(404).send('Invalid task idpiss');
+    }
+    Todo.findById(id)
+        .then((x) => {
+            if (!x) {
+                res.status(404).send('task not founded');
+            }
+            res.send({todo:x});
+        })
+        .catch((err) => console.log('cannot connect to mongo db'));
+
+    
 });
 
 app.listen(3000, () => {
