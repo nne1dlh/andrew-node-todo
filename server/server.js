@@ -12,7 +12,7 @@ app.use(bp.json());
 app.post('/todos', (req,res) => {
     console.log("from server.js",req.body);
     var task = new Todo({
-        task: req.body.text
+        task: req.body.text //looking for text prop in request
     });
     task.save().then((resx) => {
         console.log("send resx: ", resx);
@@ -24,9 +24,7 @@ app.post('/todos', (req,res) => {
 
 app.get('/todos', (req,res) => {
     Todo.find().then((x) => {
-        res.send({
-            todos: x
-        })
+        res.send({ todos: x});
     }, (err) => {
         res.status(400).send(err);
     });
