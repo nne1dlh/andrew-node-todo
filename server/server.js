@@ -40,11 +40,11 @@ app.get('/todos/:idx', (req,res) =>{
     Todo.findById(id)
         .then((x) => {
             if (!x) {
-                res.status(404).send('task not founded');
+             return res.status(404).send('task not founded');
             }
-            res.send({todo:x});
+             res.send({todo:x});
         })
-        .catch((err) => console.log('cannot connect to mongo db'));
+        .catch((err) => console.log('cannot connect to mongo db',err));
 
     
 });
