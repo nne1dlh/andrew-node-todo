@@ -6,6 +6,7 @@ var {Todo} = require('./models/todo');
 var User = require('./models/user').User;
 const {ObjectID} = require('mongodb');
 
+const port =process.env.PORT || 3000;
 var app = xpress();
 
 app.use(bp.json());
@@ -49,8 +50,8 @@ app.get('/todos/:idx', (req,res) =>{
     
 });
 
-app.listen(3000, () => {
-    console.log('started on port 3000...');
+app.listen(port, () => {
+    console.log(`started on port ${port}...`);
 });
 
 module.exports = {app};
