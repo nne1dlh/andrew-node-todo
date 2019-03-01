@@ -46,8 +46,30 @@ app.get('/todos/:idx', (req,res) =>{
              res.send({todo:x});
         })
         .catch((err) => console.log('cannot connect to mongo db',err));
+});
 
-    
+app.delete('/todos/:idx', (req,res) => {
+    //get the id
+    var id = req.params.idx;
+    if(!ObjectID.isValid(id)) {
+        return res.status(404).send('inwalid task id....');
+    }
+    Todo.findByIdAndRemove(id).then((task) => {
+        if(!task) {
+            return res.status(404).send('doc not found jerky boy');
+        }
+        removedTask = task;
+        console.log(removedTask);
+        res.send(removedTask);
+    })
+    .catch((err) => console.log("piss", err));
+
+
+    //validate id no tvalid 404
+
+    //remove todo by id
+        //sucsess
+        //error -404
 });
 
 app.listen(port, () => {
