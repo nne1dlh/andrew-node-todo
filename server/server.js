@@ -59,8 +59,8 @@ app.delete('/todos/:idx', (req,res) => {
             return res.status(404).send('doc not found jerky boy');
         }
         removedTask = task;
-        console.log(removedTask);
-        res.send(removedTask);
+        console.log("PIISSSSSSSSSSSS",removedTask);
+        res.send({todo: removedTask});
     })
     .catch((err) => console.log("piss", err));
 

@@ -61,6 +61,7 @@ describe('POST /todos', () => {
                 .catch((err) => done(err));
             });
     });
+});
 
     describe('GET /todos', () => {
         it('should get all todos', (done) => {
@@ -100,6 +101,45 @@ describe('POST /todos', () => {
                 .end(done);
         });
     });
-});
+
+    describe('DELETE /todos/:id', () => {
+        it('should delete one task', (done) => {
+            var hexId = todoos[1]._id.toHexString();
+
+            request(app)
+                .delete(`/todos/${hexId}`)
+                .expect(200)
+                .expect((resx) => {
+                    expect(resx.body.todo._id).toBe(hexId);
+                })
+                .end((err,resx) => {
+                    if(err) {
+                        return done(err);
+                    }
+                    Todo.findById(hexId).then((x) => {
+                        console.log("@@@@@@@@@@@@@@@@@", x);
+                        expect(x).toBeNull();
+                        done();
+                    })
+                    .catch((err) => done(err));
+                });
+        });
+
+         it('shouldl return 404 if todo not found', (done) => {
+            var hexId = new ObjectID().toHexString();
+            request(app)
+                .delete(`/todos/${hexId}`)
+                .expect(404)
+                .end(done);
+         });
+
+        it('shoud return 404 if ID is invlid', (done) => {
+            request(app)
+                .delete('/todos/123abc')
+                .expect(404)
+                .end(done);
+        });
+    });
+
 
 
