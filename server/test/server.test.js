@@ -10,7 +10,9 @@ const todoos = [{
     task: 'First test toto'
 }, {
     _id: new ObjectID(),
-    task: 'Second test toto'
+    task: 'Second test toto',
+    completed: true,
+    completedAt: 335
 }];
 
 beforeEach((done) => {
@@ -138,6 +140,44 @@ describe('POST /todos', () => {
                 .delete('/todos/123abc')
                 .expect(404)
                 .end(done);
+        });
+    });
+
+    describe('PATCH /todos/:id', () => {
+        it('should update the todo', (done) => {
+            var hexId = todoos[0]._id.toHexString();
+            var text = "Finish second bench";
+            request(app)
+            .patch(`/todos/${hexId}`)
+            .send({
+                completed: true,
+                task: text
+            })
+            .expect(200)
+            .expect((resx) => {
+                expect(resx.body.todo.task).toBe(text);
+                expect(resx.body.todo.completed).toBe(true);
+                expect(typeof resx.body.todo.completedAt).toBe('number');
+            })
+            .end(done);
+        });
+
+        it('should lear compAt when todo is not complete', (done) => {
+            var hexId = todoos[1]._id.toHexString();
+            var text = "Finish siding house";
+            request(app)
+            .patch(`/todos/${hexId}`)
+            .send({
+                completed: false,
+                task: text
+            })
+            .expect(200)
+            .expect((resx) => {
+                expect(resx.body.todo.task).toBe(text);
+                expect(resx.body.todo.completed).toBe(false);
+                expect(resx.body.todo.completedAt).toBeNull();
+            })
+            .end(done);
         });
     });
 
