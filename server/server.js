@@ -1,5 +1,6 @@
-var xpress = require('express');
-var bp = require('body-parser');
+const xpress = require('express');
+const _ = require('lodash');
+const bp = require('body-parser');
 
 var {mongoose} = require('./db/mongooz');
 var {Todo} = require('./models/todo');
@@ -70,6 +71,32 @@ app.delete('/todos/:idx', (req,res) => {
     //remove todo by id
         //sucsess
         //error -404
+});
+
+app.patch('/todos/:id', (req,res) => {
+    var id = req.params.id;
+    var body = _.pick(req.body, ['task','completed']);
+    if(!ObjectID.isValid(id)) {
+        return res.status(404).send('inwalid task id....');
+    }
+    if(_.isBoolean(body.completed) && body.completed) {
+        body.completedAt = new Date().getTime();
+    } else {
+        body.completed = false;
+        body.completedAt = null;
+    }
+
+    Todo.findByIdAndUpdate(id, {$set: body}, {new: true})
+        .then((todo) => {
+            if(!todo) {
+                res.status(404).send('task not found');
+            }
+            res.send({todo});
+        })
+        .catch((err) => {
+            res.status(400).send(err);
+        })
+
 });
 
 app.listen(port, () => {
