@@ -105,8 +105,8 @@ app.post('/users', (req, res) => {
     var body = _.pick(req.body, ['name','email', 'password']);
     var usr = new User(body);
 
-    //User.findByToken
-    //User.generateAuthToken
+    //User.findByToken -> model method
+    //user.generateAuthToken -> instance method
 
     usr.save().then(() => {
         return usr.generateAuthToken();
@@ -118,6 +118,19 @@ app.post('/users', (req, res) => {
         res.status(400).send(err);
     })
 });
+
+app.get('/users/me', (req,res) => {
+    var token = req.header('x-auth');
+
+    User.findByToken(token).then((user) => {
+        if(!user) {
+
+        }
+
+        res.send(user);
+    })
+
+})
 
 app.listen(port, () => {
     console.log(`started on port ${port}...`);

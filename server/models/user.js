@@ -40,24 +40,47 @@ var UserSchema = new mongooz.Schema({
    }]
 });
 
-// UserSchema.methods.toJSON = function() {
-//     var user = this;
-//     var userObject = user.toObject();
+UserSchema.methods.toJSON = function() {
+    var user = this;
+    var userObject = user.toObject();
 
-//     return _.pick(userObject, ['_id', 'email', 'name']);
-//  };
+    return _.pick(userObject, ['_id', 'email', 'name']);
+ };
 
 UserSchema.methods.generateAuthToken = function () {
-    var usr = this;
+    var usr = this; //binds individual document
     var access = 'auth';
     var token = jwt.sign({_id: usr._id.toHexString(), access}, 'abc123').toString();
     //console.log("token from model", token);
 
     usr.tokens = usr.tokens.concat([{access,token}]);
-    
+    return usr.save().then(() => {
         console.log("from save");
         return token;
+    })
+
+    
+    
+        
 };
+
+UserSchema.statics.findByToken = function(token) {
+    var User = this;
+    var decoded;
+
+    try {
+        decoded = jwt.verify(token, 'abc123');
+    } catch(e) {
+
+    }
+    return User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+
+
+    })
+}
 
 var Userp = mongooz.model('Users', UserSchema);
 
