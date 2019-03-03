@@ -39,7 +39,7 @@ var UserSchema = new mongooz.Schema({
         }
    }]
 });
-
+//instance method
 UserSchema.methods.toJSON = function() {
     var user = this;
     var userObject = user.toObject();
@@ -58,12 +58,9 @@ UserSchema.methods.generateAuthToken = function () {
         console.log("from save");
         return token;
     })
-
-    
-    
-        
 };
 
+//model method
 UserSchema.statics.findByToken = function(token) {
     var User = this;
     var decoded;
@@ -71,15 +68,13 @@ UserSchema.statics.findByToken = function(token) {
     try {
         decoded = jwt.verify(token, 'abc123');
     } catch(e) {
-
+       return Promise.reject();
     }
     return User.findOne({
         '_id': decoded._id,
         'tokens.token': token,
         'tokens.access': 'auth'
-
-
-    })
+    });
 }
 
 var Userp = mongooz.model('Users', UserSchema);

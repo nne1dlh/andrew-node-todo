@@ -9,6 +9,8 @@ var {Todo} = require('./models/todo');
 var User = require('./models/user').User;
 const {ObjectID} = require('mongodb');
 
+var auth = require('./middleware/authenticate').authenticate;
+
 const port =process.env.PORT || 3000;
 var app = xpress();
 
@@ -119,18 +121,9 @@ app.post('/users', (req, res) => {
     })
 });
 
-app.get('/users/me', (req,res) => {
-    var token = req.header('x-auth');
-
-    User.findByToken(token).then((user) => {
-        if(!user) {
-
-        }
-
-        res.send(user);
-    })
-
-})
+app.get('/users/me', auth, (req, res) => {
+    res.send(req.user);
+});
 
 app.listen(port, () => {
     console.log(`started on port ${port}...`);
