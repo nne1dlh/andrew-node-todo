@@ -22,7 +22,7 @@ app.post('/todos', (req,res) => {
         task: req.body.text //looking for text prop in request
     });
     task.save().then((resx) => {
-        console.log("send resx: ", resx);
+        //console.log("send resx: ", resx);
         res.send(resx);
     }, (err) => {
         res.status(400).send(err);
@@ -50,7 +50,7 @@ app.get('/todos/:idx', (req,res) =>{
             }
              res.send({todo:x});
         })
-        .catch((err) => console.log('cannot connect to mongo db',err));
+        .catch((err) => console.log('cannot connect to mongo db'));
 });
 
 app.delete('/todos/:idx', (req,res) => {
