@@ -125,8 +125,27 @@ app.get('/users/me', auth, (req, res) => {
     res.send(req.user);
 });
 
+app.post('/users/login', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+
+    User.findByCreds(body.email, body.password).then((user) => {
+        return user.generateAuthToken().then((tok)=> {
+            res.header('x-auth', tok).send(user);
+        });
+    }).catch((err) => {
+        res.status(400).send();
+
+    });
+    
+// bcrypt.compare(passwd, hashedPw, (err, res) => {
+//     console.log(res);
+
+    //res.send(body);
+});
+
 app.listen(port, () => {
     console.log(`started on port ${port}...`);
+
 });
 
 module.exports = {app};
