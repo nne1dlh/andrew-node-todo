@@ -137,10 +137,14 @@ app.post('/users/login', (req, res) => {
 
     });
     
-// bcrypt.compare(passwd, hashedPw, (err, res) => {
-//     console.log(res);
+});
 
-    //res.send(body);
+app.delete('/users/me/token', auth, (req, res) => {
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send();
+    }, (err) => {
+        res.status(400).send(err);
+    });
 });
 
 app.listen(port, () => {
