@@ -10,7 +10,6 @@ var UserSchema = new mongooz.Schema({
         required: true, 
         trim: true,
         minlength: 3
-
     },
     email: {
         type: String,
@@ -28,16 +27,18 @@ var UserSchema = new mongooz.Schema({
         required: true,
         minlength: 4
    },
-   tokens: [{
-       access: {
-         type: String,
-         required: true  
-        },
-        token: {
+   tokens: [
+       {
+        access: {
             type: String,
-            required: true
+            required: true  
+            },
+        token: {
+                type: String,
+                required: true
+            }
         }
-   }]
+]
 });
 //instance method
 UserSchema.methods.toJSON = function() {
@@ -64,7 +65,7 @@ UserSchema.methods.removeToken = function(token) {
     var user = this;
 
     return user.update({
-        $pull: {
+        $pull: {    //mongodb method
             tokens: {
                 token: token
             }
