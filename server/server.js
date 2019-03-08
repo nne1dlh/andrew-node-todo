@@ -16,10 +16,11 @@ var app = xpress();
 
 app.use(bp.json());
 
-app.post('/todos', (req,res) => {
+app.post('/todos', auth, (req,res) => {
     console.log("from server.js",req.body);
     var task = new Todo({
-        task: req.body.text //looking for text prop in request
+        task: req.body.text, //looking for text prop in request
+        _creator: req.user._id
     });
     task.save().then((resx) => {
         //console.log("send resx: ", resx);
@@ -29,21 +30,26 @@ app.post('/todos', (req,res) => {
     });
 });
 
-app.get('/todos', (req,res) => {
-    Todo.find().then((x) => {
+app.get('/todos', auth, (req,res) => {
+    Todo.find({
+        _creator: req.user._id
+    }).then((x) => {
         res.send({ todos: x});
     }, (err) => {
         res.status(400).send(err);
     });
 });
 
-app.get('/todos/:idx', (req,res) =>{
+app.get('/todos/:idx', auth, (req,res) =>{
     var id = req.params.idx;
     //vlidate ID using isValid
     if (!ObjectID.isValid(id)){
         res.status(404).send('Invalid task idpiss');
     }
-    Todo.findById(id)
+    Todo.findOne({
+        _id: id,
+        _creator: req.user._id
+    })
         .then((x) => {
             if (!x) {
              return res.status(404).send('task not founded');
@@ -53,13 +59,17 @@ app.get('/todos/:idx', (req,res) =>{
         .catch((err) => console.log('cannot connect to mongo db'));
 });
 
-app.delete('/todos/:idx', (req,res) => {
+app.delete('/todos/:idx', auth, (req,res) => {
     //get the id
     var id = req.params.idx;
     if(!ObjectID.isValid(id)) {
         return res.status(404).send('inwalid task id....');
     }
-    Todo.findByIdAndRemove(id).then((task) => {
+    Todo.findOneAndRemove({
+        _id: id,
+        _creator: req.user._id
+
+    }).then((task) => {
         if(!task) {
             return res.status(404).send('doc not found jerky boy');
         }
@@ -77,7 +87,7 @@ app.delete('/todos/:idx', (req,res) => {
         //error -404
 });
 
-app.patch('/todos/:id', (req,res) => {
+app.patch('/todos/:id', auth, (req,res) => {
     var id = req.params.id;
     var body = _.pick(req.body, ['task','completed']);
     if(!ObjectID.isValid(id)) {
@@ -90,7 +100,10 @@ app.patch('/todos/:id', (req,res) => {
         body.completedAt = null;
     }
 
-    Todo.findByIdAndUpdate(id, {$set: body}, {new: true})
+    Todo.findOneAndUpdate({
+        _id: id,
+        _creator: req.user._id
+    }, {$set: body}, {new: true})
         .then((todo) => {
             if(!todo) {
                 res.status(404).send('task not found');

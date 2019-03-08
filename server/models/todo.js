@@ -15,6 +15,10 @@ var Todo = mongooz.model('Todo', {
     completedAt: {
         type: Number,
         default: null
+    },
+    _creator: {
+        type: mongooz.Schema.Types.ObjectId,
+        required: true,
     }
 });
 
